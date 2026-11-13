@@ -62,6 +62,7 @@
     <div class="nav-item" data-view="pos">POS / Retail</div>
     <div class="nav-item" data-view="invoices">Invoices</div>
     <div class="nav-item" data-view="customers">Customers</div>
+    <div class="nav-item" data-view="packages">Packages</div>
     <div class="nav-item" data-view="modules">Modules</div>
   </aside>
 
@@ -150,6 +151,27 @@
       </table>
     </div>
 
+    <div id="view-packages" class="hidden">
+      <div class="card" style="margin-bottom:1rem;">
+        <h3>Free packages</h3>
+        <p style="margin:0.5rem 0 1rem; color:var(--muted);">Install and run the open-source bases. Data from IndexedDB or your serverless API appears in the modules above.</p>
+        <table>
+          <tr><th>Package</th><th>Base</th><th>Status</th><th>Action</th></tr>
+          <tr><td>Property</td><td>OpenProperty</td><td><span class="badge ok">Ready</span></td><td><a href="../../packages/property/">Install</a></td></tr>
+          <tr><td>Field Service</td><td>OpenFieldService</td><td><span class="badge ok">Ready</span></td><td><a href="../../packages/field-service/">Install</a></td></tr>
+          <tr><td>POS / Retail</td><td>Dolibarr Docker</td><td><span class="badge ok">Ready</span></td><td><a href="../../packages/pos-retail/">Install</a></td></tr>
+          <tr><td>General SMB</td><td>Dolibarr Docker</td><td><span class="badge ok">Ready</span></td><td><a href="../../packages/general-smb/">Install</a></td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Serverless endpoint</h3>
+        <p style="margin:0.5rem 0; color:var(--muted);">Leave empty to use IndexedDB (no server). Or paste a Cloudflare Worker / Turso HTTP URL.</p>
+        <input id="api-endpoint" type="text" placeholder="https://your-worker.workers.dev" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:6px; margin:0.5rem 0;">
+        <button class="btn" id="save-api">Save endpoint</button>
+        <p id="api-status" style="margin-top:0.5rem; font-size:0.85rem; color:var(--muted);"></p>
+      </div>
+    </div>
+
     <div id="view-modules" class="hidden">
       <div class="card">
         <h3 style="margin-bottom:1rem;">Enable modules (like Dolibarr)</h3>
@@ -163,6 +185,7 @@
     </div>
   </main>
 
+  <script src="data.js"></script>
   <script>
     const titles = {
       dashboard: "Dashboard",
@@ -171,8 +194,40 @@
       pos: "POS / Retail",
       invoices: "Invoices",
       customers: "Customers",
+      packages: "Packages",
       modules: "Modules"
     };
+
+    async function refresh() {
+      const props = await OpenPacksDB.load("properties", "/api/properties");
+      const jobs = await OpenPacksDB.load("jobs", "/api/jobs");
+      const invoices = await OpenPacksDB.load("invoices", "/api/invoices");
+      const customers = await OpenPacksDB.load("customers", "/api/customers");
+      const pos = await OpenPacksDB.load("pos_items", "/api/pos");
+
+      const occ = props.reduce((a, p) => a + (p.occupied || 0), 0);
+      const units = props.reduce((a, p) => a + (p.units || 0), 0);
+      const unpaid = invoices.filter(i => i.status !== "Paid").reduce((a, i) => a + (i.amount || 0), 0);
+
+      document.querySelector("#view-dashboard .num").textContent = units ? Math.round(occ / units * 100) + "%" : "—";
+      document.querySelectorAll("#view-dashboard .num")[1].textContent = jobs.filter(j => j.status !== "Completed").length;
+      document.querySelectorAll("#view-dashboard .num")[3].textContent = "$" + unpaid.toLocaleString();
+
+      fillTable("view-property", props, p => `<tr><td>${p.name}</td><td>${p.units}</td><td>${p.occupied}</td><td>$${p.rentDue || 0}</td></tr>`);
+      fillTable("view-field", jobs, j => `<tr><td>${j.title}</td><td>${j.customer}</td><td>${j.tech}</td><td><span class="badge ${j.status === 'In Progress' ? 'warn' : 'ok'}">${j.status}</span></td></tr>`);
+      fillTable("view-pos", pos, i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>$${i.price}</td><td><span class="badge ${i.stock === 'Low' ? 'warn' : 'ok'}">${i.stock}</span></td></tr>`);
+      fillTable("view-invoices", invoices, inv => `<tr><td>${inv.number}</td><td>${inv.customer}</td><td>$${inv.amount}</td><td><span class="badge ${inv.status === 'Overdue' ? 'bad' : inv.status === 'Paid' ? 'ok' : 'warn'}">${inv.status}</span></td></tr>`);
+      fillTable("view-customers", customers, c => `<tr><td>${c.name}</td><td>${c.type}</td><td>${c.contact || "—"}</td><td>$${c.balance || 0}</td></tr>`);
+    }
+
+    function fillTable(viewId, rows, rowFn) {
+      const table = document.querySelector("#" + viewId + " table");
+      if (!table) return;
+      const header = table.querySelector("tr");
+      table.innerHTML = "";
+      table.appendChild(header);
+      rows.forEach(r => table.insertAdjacentHTML("beforeend", rowFn(r)));
+    }
 
     document.querySelectorAll(".nav-item").forEach(item => {
       item.addEventListener("click", () => {
@@ -185,17 +240,24 @@
       });
     });
 
-    document.querySelectorAll("[data-mod]").forEach(cb => {
-      cb.addEventListener("change", () => {
-        const mod = cb.dataset.mod;
-        const nav = document.querySelector(`.nav-item[data-view="${mod}"]`);
-        if (nav) nav.style.display = cb.checked ? "" : "none";
-      });
+    document.getElementById("save-api").addEventListener("click", async () => {
+      const endpoint = document.getElementById("api-endpoint").value.trim();
+      await OpenPacksDB.put("settings", [{ id: "api", endpoint, provider: endpoint ? "serverless" : "indexeddb" }]);
+      document.getElementById("api-status").textContent = endpoint ? "Saved. Reloading data…" : "Using IndexedDB.";
+      await refresh();
     });
 
     document.getElementById("action-btn").addEventListener("click", () => {
-      alert("New record — connect to your backend or extend this demo. Data is sample only.");
+      alert("Add a new record — extend this demo or connect your serverless API.");
     });
+
+    (async () => {
+      await OpenPacksDB.open();
+      await OpenPacksDB.seed();
+      const ep = await OpenPacksDB.getApiEndpoint();
+      if (ep) document.getElementById("api-endpoint").value = ep;
+      await refresh();
+    })();
   </script>
 </body>
 </html>

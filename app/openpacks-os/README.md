@@ -1,20 +1,16 @@
 # OpenPacks Business OS
 
-Modular business management suite inspired by Dolibarr, customized for OpenPacks verticals.
+Modular business suite. Data layer uses IndexedDB by default (no server). Optional serverless API (Cloudflare D1 or Turso).
 
 ## Features
-- Dashboard with occupancy, jobs, sales, unpaid invoices
-- Property Management module
-- Field Service module (HVAC, landscaping, handyman)
-- POS / Retail module
-- Invoicing
-- Customers / CRM
-- Module toggles — enable only what you need
+- Dashboard, Property, Field Service, POS, Invoices, Customers
+- **Packages** panel — links to free installers (OpenProperty, OpenFieldService, Dolibarr)
+- **Modules** — toggle what appears
+- Serverless endpoint field — paste a Worker URL to switch from IndexedDB to D1/Turso
 
 ## Run
-Open `index.html` in any browser, or visit:
+Open `index.html` or visit:
 **https://praveenkay.github.io/Openpacks/app/openpacks-os/**
 
-Works on web, Mac, Windows, and mobile browsers.
-
-Sample data only. Connect your own backend or use the free packages (OpenProperty, OpenFieldService, Dolibarr) for production.
+## Serverless
+See `serverless/` in the repo for a Cloudflare Worker + D1 example.
