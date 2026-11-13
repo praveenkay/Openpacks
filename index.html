@@ -166,11 +166,63 @@
   </section>
 
   <section id="packs" class="section">
-    <h2>Industry Packs</h2>
-    <p style="text-align:center; color:var(--muted); margin-bottom:2rem;">Each pack is a free open-source base, pre-configured. Customize further for any area, local rules, or trade.</p>
-    <div class="grid" id="packs-grid">
-      <!-- Populated by JS for interactivity -->
+    <h2>Free Packages — Install in Minutes</h2>
+    <p style="text-align:center; color:var(--muted); margin-bottom:2rem;">Few-click free installs for every vertical. Clone the repo, run the wizard, open the URL.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="badge">Property</div>
+        <h3>Property Pack</h3>
+        <p>OpenProperty — units, leases, rent, maintenance.</p>
+        <p class="price">Free</p>
+        <ul>
+          <li><code>cd packages/property</code></li>
+          <li><code>./install.sh "My Properties"</code></li>
+          <li>Open http://localhost:5173</li>
+        </ul>
+        <a class="btn" href="https://github.com/praveenkay/openpacks/tree/main/packages/property" target="_blank">Get Package</a>
+      </div>
+      <div class="card">
+        <div class="badge">Field Service</div>
+        <h3>Field Service Pack</h3>
+        <p>HVAC, landscaping, handyman, trades — scheduling, jobs, invoicing.</p>
+        <p class="price">Free</p>
+        <ul>
+          <li><code>cd packages/field-service</code></li>
+          <li><code>./install.sh hvac</code></li>
+          <li>Open http://localhost:5173</li>
+        </ul>
+        <a class="btn" href="https://github.com/praveenkay/openpacks/tree/main/packages/field-service" target="_blank">Get Package</a>
+      </div>
+      <div class="card">
+        <div class="badge">POS / Retail</div>
+        <h3>POS / Vendor Pack</h3>
+        <p>Shops, food trucks, markets — Docker one-command.</p>
+        <p class="price">Free</p>
+        <ul>
+          <li><code>cd packages/pos-retail</code></li>
+          <li><code>./install.sh "My Shop" 8080</code></li>
+          <li>Open http://localhost:8080 (admin/admin)</li>
+        </ul>
+        <a class="btn" href="https://github.com/praveenkay/openpacks/tree/main/packages/pos-retail" target="_blank">Get Package</a>
+      </div>
+      <div class="card">
+        <div class="badge">General</div>
+        <h3>General SMB Pack</h3>
+        <p>Invoicing, CRM, inventory for any small business.</p>
+        <p class="price">Free</p>
+        <ul>
+          <li><code>cd packages/general-smb</code></li>
+          <li><code>./install.sh "My Business" 8081</code></li>
+          <li>Open http://localhost:8081 (admin/admin)</li>
+        </ul>
+        <a class="btn" href="https://github.com/praveenkay/openpacks/tree/main/packages/general-smb" target="_blank">Get Package</a>
+      </div>
     </div>
+    <p style="text-align:center; margin-top:2rem; color:var(--muted);">All packages live in the <a href="https://github.com/praveenkay/openpacks/tree/main/packages" style="color:var(--accent);">packages/</a> folder. See each README for details.</p>
+  </section>
+
+  <section id="packs-js" class="section" style="display:none;">
+    <div class="grid" id="packs-grid"></div>
   </section>
 
   <section id="pricing" class="section">
