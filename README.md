@@ -6,38 +6,56 @@ Start completely free by self-hosting mature open-source projects from GitHub. S
 
 Fully customizable for any trade, local rules, language, or workflow.
 
-## Live App / Site
-The interactive landing page lives in `app/index.html`.  
-Enable GitHub Pages on the `main` branch (or `/docs` / root) to host it.
+**Live site:** https://praveenkay.github.io/Openpacks/
 
-**Repo:** https://github.com/praveenkay/openpacks
+---
 
-## What’s Inside
-- `app/index.html` — Interactive landing page with pain points, packs, pricing, competitive landscape, and demo videos.
-- `docs/` — Research and packaging blueprints:
-  - `Vertical_Pain_Points.md`
-  - `Packaging_Blueprints.md`
-  - `Competitive_Landscape.md`
-- `packages/` — Starter packaging notes and Docker examples for the free bases.
+## What’s on the live site
+The interactive landing page (`index.html` at the root, also in `app/index.html`) includes:
+
+- **Pain Points** — Late rent & maintenance chaos, scheduling waste, route chaos, admin longer than the job, offline checkout issues, stockouts, table/kitchen blindness, spreadsheet invoicing.
+- **Customizable for Any Area** — Field & service work, property & rentals, retail/vendors/POS, general operations. Same bases can be configured for any trade or local rules.
+- **Pack Demos** — Short concept videos of Property OS, Field Service OS, and Vendor/POS OS.
+- **Industry Packs** — Property, HVAC/trades, landscaping, handyman, small vendors, retail, restaurants, general SMB.
+- **Pricing** — Free self-host, Starter Packs ($499–$2,500), Managed ($49–$249/mo), Custom from $1,500.
+- **Blueprints** — Free base → paid enhancements for each vertical.
+- **Compare / Competitive Landscape** — vs AppFolio, Buildium, Jobber, Housecall Pro, custom AI builds.
+
+## Repository structure
+```
+├── index.html                  # Live site (GitHub Pages root)
+├── app/
+│   ├── index.html              # Same app (source)
+│   ├── demo-property.mp4       # Property OS demo
+│   ├── demo-field.mp4          # Field service demo
+│   └── demo-pos.mp4            # Vendor / POS demo
+├── docs/
+│   ├── Vertical_Pain_Points.md
+│   ├── Packaging_Blueprints.md
+│   └── Competitive_Landscape.md
+└── packages/
+    └── README.md               # Starter packaging & Docker notes
+```
 
 ## Free Open-Source Bases
-| Vertical              | Recommended Free Base                          | License     | Notes |
-|-----------------------|------------------------------------------------|-------------|-------|
-| Property / Rentals    | [OpenProperty](https://github.com/clawnify/OpenProperty) | MIT        | Units, leases, rent ledger, work orders |
-| Field Service (HVAC, landscaping, handyman) | [OpenFieldPro](https://github.com/niko4244/openfieldpro) or [OpenFieldService](https://github.com/clawnify/OpenFieldService) | AGPL / check | Dispatch, jobs, invoicing |
-| Retail / Vendors / POS | Posnic or MyCompany    | AGPL / Apache | Offline-first POS |
-| General SMB           | Dolibarr, ERPNext, MyCompany                   | GPL / Apache | Full ERP |
-| Restaurants           | URY on ERPNext or Posnic                       | —           | Tables + KDS |
+| Vertical | Recommended Free Base | URL | License |
+|----------|-----------------------|-----|---------|
+| Property / Rentals | OpenProperty | https://github.com/clawnify/OpenProperty | MIT |
+| Field Service (HVAC, landscaping, handyman, etc.) | OpenFieldPro | https://github.com/niko4244/openfieldpro | AGPL |
+| Field Service (lighter) | OpenFieldService | https://github.com/clawnify/OpenFieldService | check repo |
+| Retail / Vendors / POS | Posnic or MyCompany | search GitHub | AGPL / Apache |
+| General SMB | Dolibarr, ERPNext, MyCompany | official sites / GitHub | GPL / Apache |
+| Restaurants | URY on ERPNext or Posnic | — | — |
 
-## Pricing Model (intentional SMB rates)
+## Pricing Model
 - **Free / Community**: $0 — Self-host any base. Unlimited.
-- **Starter Pack**: $499–$2,500 one-time — Pre-configured industry pack + guided setup.
+- **Starter Pack**: $499–$2,500 one-time — Pre-configured industry pack + guided setup + sample data.
 - **Managed**: $49–$249 / month — Hosting, updates, backups, priority support.
 - **Custom**: From $1,500 — Modules, integrations, localizations, training.
 
-All lower than typical enterprise custom AI/ERP builds ($7k–$60k+).
+All far below typical enterprise custom AI/ERP builds ($7k–$60k+).
 
-## Quick Start (example for a free base)
+## Quick Start (example free base)
 ```bash
 # Example: OpenProperty
 git clone https://github.com/clawnify/OpenProperty.git
@@ -46,11 +64,10 @@ pnpm install
 pnpm dev
 ```
 
-See `docs/Packaging_Blueprints.md` for full free → paid layers per vertical.
+See `docs/Packaging_Blueprints.md` for full free → paid layers per vertical and `packages/README.md` for Docker notes.
 
 ## License
-Packaging, docs, and landing page: MIT (or your preference).  
+Packaging, docs, and landing page: MIT.  
 Underlying bases retain their original licenses (MIT, AGPL, GPL, Apache, etc.). Always check and comply.
 
-## Contact
 Built for SMBs that want control, lower cost, and the ability to start free.
