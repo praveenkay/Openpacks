@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenPacks Business OS</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --sidebar: #1e2a3a;
+      --sidebar-text: #c5d0dc;
+      --accent: #00a88a;
+      --accent-dark: #008f75;
+      --card: #fff;
+      --text: #1a2332;
+      --muted: #6b7c93;
+      --border: #e2e8f0;
+      --danger: #e53e3e;
+      --warn: #dd6b20;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: var(--sidebar); color: var(--sidebar-text); padding: 1rem 0; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .sidebar .logo { padding: 0 1.25rem 1.25rem; font-weight: 700; font-size: 1.15rem; color: #fff; border-bottom: 1px solid #2d3e52; margin-bottom: 1rem; }
+    .sidebar .logo span { color: var(--accent); }
+    .nav-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 1.25rem; cursor: pointer; font-size: 0.92rem; transition: background 0.15s; }
+    .nav-item:hover, .nav-item.active { background: #2a3d52; color: #fff; }
+    .nav-item.active { border-left: 3px solid var(--accent); }
+    .main { flex: 1; padding: 1.5rem; overflow-y: auto; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .topbar h1 { font-size: 1.5rem; }
+    .btn { background: var(--accent); color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+    .btn:hover { background: var(--accent-dark); }
+    .btn.secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .card { background: var(--card); border-radius: 10px; padding: 1.1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+    .card h3 { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.4rem; }
+    .card .num { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+    .card .sub { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+    table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; }
+    th, td { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    th { background: #f8fafc; color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+    .badge.ok { background: #c6f6d5; color: #22543d; }
+    .badge.warn { background: #feebc8; color: #7b341e; }
+    .badge.bad { background: #fed7d7; color: #822727; }
+    .module-toggle { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+    .hidden { display: none; }
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: relative; }
+      .nav-item { display: inline-flex; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">Open<span>Packs</span> OS</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div>
+    <div class="nav-item" data-view="property">Property</div>
+    <div class="nav-item" data-view="field">Field Service</div>
+    <div class="nav-item" data-view="pos">POS / Retail</div>
+    <div class="nav-item" data-view="invoices">Invoices</div>
+    <div class="nav-item" data-view="customers">Customers</div>
+    <div class="nav-item" data-view="modules">Modules</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1 id="view-title">Dashboard</h1>
+      <button class="btn" id="action-btn">+ New</button>
+    </div>
+
+    <div id="view-dashboard">
+      <div class="grid">
+        <div class="card"><h3>Occupancy</h3><div class="num">86%</div><div class="sub">Property units</div></div>
+        <div class="card"><h3>Open Jobs</h3><div class="num">12</div><div class="sub">Field service</div></div>
+        <div class="card"><h3>Today Sales</h3><div class="num">$1,240</div><div class="sub">POS / Retail</div></div>
+        <div class="card"><h3>Unpaid</h3><div class="num">$3,180</div><div class="sub">Invoices</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">Recent Activity</h3>
+        <table>
+          <tr><th>Type</th><th>Description</th><th>Status</th><th>Amount</th></tr>
+          <tr><td>Rent</td><td>Unit 204 — Oakwood</td><td><span class="badge ok">Paid</span></td><td>$1,450</td></tr>
+          <tr><td>Job</td><td>HVAC repair — 142 Main</td><td><span class="badge warn">In Progress</span></td><td>$320</td></tr>
+          <tr><td>POS</td><td>Market stall sale</td><td><span class="badge ok">Complete</span></td><td>$48</td></tr>
+          <tr><td>Invoice</td><td>INV-1042 — Landscaping</td><td><span class="badge bad">Overdue</span></td><td>$890</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div id="view-property" class="hidden">
+      <div class="grid">
+        <div class="card"><h3>Properties</h3><div class="num">4</div></div>
+        <div class="card"><h3>Units</h3><div class="num">18</div></div>
+        <div class="card"><h3>Collected</h3><div class="num">$12,400</div></div>
+      </div>
+      <table>
+        <tr><th>Property</th><th>Units</th><th>Occupied</th><th>Rent Due</th></tr>
+        <tr><td>Oakwood Apartments</td><td>8</td><td>7</td><td>$1,450</td></tr>
+        <tr><td>Pine Street Duplex</td><td>2</td><td>2</td><td>$0</td></tr>
+        <tr><td>Maple House</td><td>1</td><td>1</td><td>$0</td></tr>
+      </table>
+    </div>
+
+    <div id="view-field" class="hidden">
+      <div class="grid">
+        <div class="card"><h3>Scheduled</h3><div class="num">8</div></div>
+        <div class="card"><h3>In Progress</h3><div class="num">3</div></div>
+        <div class="card"><h3>Completed</h3><div class="num">24</div></div>
+      </div>
+      <table>
+        <tr><th>Job</th><th>Customer</th><th>Tech</th><th>Status</th></tr>
+        <tr><td>AC repair</td><td>142 Main St</td><td>Alex</td><td><span class="badge warn">In Progress</span></td></tr>
+        <tr><td>Lawn service</td><td>88 Oak Ave</td><td>Sam</td><td><span class="badge ok">Scheduled</span></td></tr>
+        <tr><td>Handyman — faucet</td><td>15 Elm</td><td>Jordan</td><td><span class="badge ok">Scheduled</span></td></tr>
+      </table>
+    </div>
+
+    <div id="view-pos" class="hidden">
+      <div class="grid">
+        <div class="card"><h3>Today</h3><div class="num">$1,240</div></div>
+        <div class="card"><h3>Items</h3><div class="num">42</div></div>
+        <div class="card"><h3>Low Stock</h3><div class="num">3</div></div>
+      </div>
+      <table>
+        <tr><th>Item</th><th>Qty</th><th>Price</th><th>Stock</th></tr>
+        <tr><td>Coffee blend</td><td>12</td><td>$8</td><td><span class="badge ok">OK</span></td></tr>
+        <tr><td>Pastry</td><td>8</td><td>$4</td><td><span class="badge warn">Low</span></td></tr>
+        <tr><td>Water</td><td>20</td><td>$2</td><td><span class="badge ok">OK</span></td></tr>
+      </table>
+    </div>
+
+    <div id="view-invoices" class="hidden">
+      <table>
+        <tr><th>Invoice</th><th>Customer</th><th>Amount</th><th>Status</th></tr>
+        <tr><td>INV-1042</td><td>Green Lawn Co</td><td>$890</td><td><span class="badge bad">Overdue</span></td></tr>
+        <tr><td>INV-1041</td><td>Oakwood</td><td>$1,450</td><td><span class="badge ok">Paid</span></td></tr>
+        <tr><td>INV-1040</td><td>142 Main</td><td>$320</td><td><span class="badge warn">Sent</span></td></tr>
+      </table>
+    </div>
+
+    <div id="view-customers" class="hidden">
+      <table>
+        <tr><th>Name</th><th>Type</th><th>Contact</th><th>Balance</th></tr>
+        <tr><td>Oakwood Properties</td><td>Property</td><td>info@oakwood.example</td><td>$0</td></tr>
+        <tr><td>Green Lawn Co</td><td>Field</td><td>sam@greenlawn.example</td><td>$890</td></tr>
+        <tr><td>Market Stall #4</td><td>POS</td><td>—</td><td>$0</td></tr>
+      </table>
+    </div>
+
+    <div id="view-modules" class="hidden">
+      <div class="card">
+        <h3 style="margin-bottom:1rem;">Enable modules (like Dolibarr)</h3>
+        <div class="module-toggle"><span>Property Management</span><input type="checkbox" checked data-mod="property"></div>
+        <div class="module-toggle"><span>Field Service</span><input type="checkbox" checked data-mod="field"></div>
+        <div class="module-toggle"><span>POS / Retail</span><input type="checkbox" checked data-mod="pos"></div>
+        <div class="module-toggle"><span>Invoicing</span><input type="checkbox" checked data-mod="invoices"></div>
+        <div class="module-toggle"><span>Customers / CRM</span><input type="checkbox" checked data-mod="customers"></div>
+        <p style="margin-top:1rem; font-size:0.85rem; color:var(--muted);">Only enabled modules appear in the sidebar. Customize for any trade or area.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const titles = {
+      dashboard: "Dashboard",
+      property: "Property Management",
+      field: "Field Service",
+      pos: "POS / Retail",
+      invoices: "Invoices",
+      customers: "Customers",
+      modules: "Modules"
+    };
+
+    document.querySelectorAll(".nav-item").forEach(item => {
+      item.addEventListener("click", () => {
+        document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+        item.classList.add("active");
+        const view = item.dataset.view;
+        document.querySelectorAll("[id^='view-']").forEach(v => v.classList.add("hidden"));
+        document.getElementById("view-" + view).classList.remove("hidden");
+        document.getElementById("view-title").textContent = titles[view] || view;
+      });
+    });
+
+    document.querySelectorAll("[data-mod]").forEach(cb => {
+      cb.addEventListener("change", () => {
+        const mod = cb.dataset.mod;
+        const nav = document.querySelector(`.nav-item[data-view="${mod}"]`);
+        if (nav) nav.style.display = cb.checked ? "" : "none";
+      });
+    });
+
+    document.getElementById("action-btn").addEventListener("click", () => {
+      alert("New record — connect to your backend or extend this demo. Data is sample only.");
+    });
+  </script>
+</body>
+</html>
