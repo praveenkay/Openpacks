@@ -26,7 +26,8 @@ jobs:
           mkdir -p _site
           cp index.html _site/
           cp -r app _site/
-          # Keep only what the site needs
+          mkdir -p _site/packages
+          cp -r packages/wizard _site/packages/
           rm -rf _site/app/index.html || true
 
       - name: Upload artifact

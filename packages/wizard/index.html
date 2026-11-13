@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenPacks Installer — Any Device</title>
+  <style>
+    :root { --bg:#0f1419; --card:#1a2332; --accent:#00d4aa; --text:#e7ecf3; --muted:#8b9bb4; --border:#2a3548; }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background:var(--bg); color:var(--text); line-height:1.6; padding:1rem; }
+    .wrap { max-width:720px; margin:0 auto; }
+    h1 { font-size:1.8rem; margin:1rem 0 0.5rem; }
+    .sub { color:var(--muted); margin-bottom:1.5rem; }
+    .step { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem; margin-bottom:1rem; }
+    .step h2 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); }
+    label { display:block; margin:0.5rem 0 0.25rem; font-size:0.9rem; color:var(--muted); }
+    select, input { width:100%; padding:0.7rem; border-radius:8px; border:1px solid var(--border); background:#0f1419; color:var(--text); font-size:1rem; }
+    .btn { display:inline-block; padding:0.75rem 1.25rem; background:var(--accent); color:#0f1419; border:none; border-radius:8px; font-weight:600; cursor:pointer; margin-top:0.75rem; font-size:1rem; }
+    .btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .result { background:#141c28; border-radius:8px; padding:1rem; margin-top:1rem; white-space:pre-wrap; font-family:ui-monospace, monospace; font-size:0.85rem; }
+    .platform { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; }
+    .platform button { flex:1; min-width:100px; padding:0.6rem; background:transparent; border:1px solid var(--border); color:var(--text); border-radius:8px; cursor:pointer; }
+    .platform button.active { border-color:var(--accent); color:var(--accent); }
+    .note { font-size:0.85rem; color:var(--muted); margin-top:0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>OpenPacks Installer</h1>
+    <p class="sub">Works in any browser — Mac, Windows, Linux, iPhone, Android. Pick a package and get install steps for your device.</p>
+
+    <div class="step">
+      <h2>1. Choose vertical</h2>
+      <select id="vertical">
+        <option value="property">Property / Rentals</option>
+        <option value="field">Field Service (HVAC, Landscaping, Handyman)</option>
+        <option value="pos">POS / Retail / Vendors</option>
+        <option value="general">General SMB</option>
+      </select>
+    </div>
+
+    <div class="step">
+      <h2>2. Choose tier</h2>
+      <select id="tier">
+        <option value="free">Free — Self-host open-source base</option>
+        <option value="starter">Starter — Pre-configured + sample data ($499–$2,500)</option>
+        <option value="managed">Managed — We host & update ($49–$249/mo)</option>
+        <option value="custom">Custom — Integrations & training (from $1,500)</option>
+      </select>
+    </div>
+
+    <div class="step">
+      <h2>3. Your device</h2>
+      <div class="platform">
+        <button type="button" data-plat="web" class="active">Web</button>
+        <button type="button" data-plat="mac">Mac</button>
+        <button type="button" data-plat="win">Windows</button>
+        <button type="button" data-plat="mobile">Mobile</button>
+      </div>
+      <p class="note">Web = open in browser. Mac/Windows = terminal or PowerShell. Mobile = browser + remote desktop or cloud.</p>
+    </div>
+
+    <div class="step">
+      <h2>4. Business name (optional)</h2>
+      <input id="name" type="text" placeholder="e.g. Oakwood Properties" value="My Business">
+      <button class="btn" id="go">Generate Install Steps</button>
+    </div>
+
+    <div class="step" id="output" style="display:none;">
+      <h2>Install steps</h2>
+      <div class="result" id="result"></div>
+      <p class="note" id="next"></p>
+    </div>
+  </div>
+
+  <script>
+    let platform = "web";
+    document.querySelectorAll(".platform button").forEach(b => {
+      b.addEventListener("click", () => {
+        document.querySelectorAll(".platform button").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        platform = b.dataset.plat;
+      });
+    });
+
+    const packs = {
+      property: {
+        free: { base: "OpenProperty", url: "https://github.com/clawnify/OpenProperty", cmd: "git clone https://github.com/clawnify/OpenProperty.git && cd OpenProperty && pnpm install && pnpm dev", port: 5173 },
+        starter: { note: "Starter adds sample data, late-rent templates, and guided setup on top of the free base." },
+        managed: { note: "Managed: we host OpenProperty, handle updates, backups, and support." },
+        custom: { note: "Custom: tenant portal, local rules, integrations, training." }
+      },
+      field: {
+        free: { base: "OpenFieldService", url: "https://github.com/clawnify/OpenFieldService", cmd: "git clone https://github.com/clawnify/OpenFieldService.git && cd OpenFieldService && pnpm install && pnpm dev", port: 5173 },
+        starter: { note: "Starter adds price book, job templates, and dispatch board config." },
+        managed: { note: "Managed: hosted field service with updates and support." },
+        custom: { note: "Custom: GPS, same-day invoicing, routes, photo proof." }
+      },
+      pos: {
+        free: { base: "Dolibarr (Docker)", url: "https://github.com/praveenkay/openpacks/tree/main/packages/pos-retail", cmd: "cd packages/pos-retail && ./install.sh", port: 8080 },
+        starter: { note: "Starter adds sample catalog, receipt branding, and low-stock config." },
+        managed: { note: "Managed: hosted POS with backups and support." },
+        custom: { note: "Custom: payment terminal, multi-location, offline sync." }
+      },
+      general: {
+        free: { base: "Dolibarr (Docker)", url: "https://github.com/praveenkay/openpacks/tree/main/packages/general-smb", cmd: "cd packages/general-smb && ./install.sh", port: 8081 },
+        starter: { note: "Starter adds sample customers, products, and invoice templates." },
+        managed: { note: "Managed: hosted ERP with updates and support." },
+        custom: { note: "Custom: local accounting, e-invoicing, modules." }
+      }
+    };
+
+    document.getElementById("go").addEventListener("click", () => {
+      const v = document.getElementById("vertical").value;
+      const t = document.getElementById("tier").value;
+      const name = document.getElementById("name").value || "My Business";
+      const p = packs[v];
+      let text = "";
+      let next = "";
+
+      if (t === "free") {
+        const f = p.free;
+        text = `Package: ${f.base} (Free)\nBusiness: ${name}\n\n`;
+        if (platform === "web") {
+          text += `1. Open this page on a computer with Node.js 20+ (or Docker for POS/General).\n2. Run in terminal:\n   ${f.cmd}\n3. Open http://localhost:${f.port}\n\nRepo: ${f.url}`;
+        } else if (platform === "mac") {
+          text += `Mac Terminal:\n1. Install Node from https://nodejs.org if needed.\n2. Run:\n   ${f.cmd}\n3. Open http://localhost:${f.port}`;
+        } else if (platform === "win") {
+          text += `Windows PowerShell or Git Bash:\n1. Install Node from https://nodejs.org.\n2. Run:\n   ${f.cmd}\n3. Open http://localhost:${f.port}`;
+        } else {
+          text += `Mobile:\n1. Use a cloud VM or your desktop.\n2. Or open the live demo site and request a managed trial.\n3. Full self-host needs a computer or server.`;
+          next = "For mobile-only use, choose Managed tier.";
+        }
+      } else if (t === "starter") {
+        text = `Starter Pack — ${name}\n\n${p.starter.note}\n\nNext steps:\n1. Run the Free package first (same vertical).\n2. Contact for starter configuration and sample data.\n3. Or use the free base and customize yourself.`;
+        next = "Starter is a one-time setup on top of the free base.";
+      } else if (t === "managed") {
+        text = `Managed — ${name}\n\n${p.managed.note}\n\nWe host, update, and support it. You get a URL that works on any device (web, Mac, Windows, mobile).`;
+        next = "Reply with your vertical and business name to start a managed trial.";
+      } else {
+        text = `Custom — ${name}\n\n${p.custom.note}\n\nScoped project: modules, integrations, local rules, training.`;
+        next = "Reply with requirements for a custom quote.";
+      }
+
+      document.getElementById("result").textContent = text;
+      document.getElementById("next").textContent = next;
+      document.getElementById("output").style.display = "block";
+      document.getElementById("output").scrollIntoView({ behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>
